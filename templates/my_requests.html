@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>My Requests</title>
+  <style>
+    table { width:100%; border-collapse:collapse; margin-top:15px; }
+    th, td { border:1px solid #ccc; padding:10px; }
+    th { background:#f3f3f3; }
+    .tag { padding:4px 10px; border-radius:12px; font-size:12px; }
+    .pending { background:#fff2cc; }
+    .approved { background:#d9ead3; }
+    .rejected { background:#f4cccc; }
+  </style>
+</head>
+<body>
+
+  <h2>My Report Requests</h2>
+
+  <a href="/student-dashboard"><button>Back to Dashboard</button></a>
+  <a href="/student-search"><button>Search Abstracts</button></a>
+
+  {% if reqs|length == 0 %}
+    <p>You have not requested any reports yet.</p>
+  {% else %}
+    <table>
+      <tr>
+        <th>ID</th>
+        <th>Report</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+      {% for r in reqs %}
+      <tr>
+        <td>{{ r.id }}</td>
+        <td>{{ reports.get(r.report_id, "Unknown") }}</td>
+        <td><span class="tag {{ r.status }}">{{ r.status }}</span></td>
+        <td>
+          {% if r.status == "approved" %}
+            <a href="/student-view-approved/{{ r.id }}"><button>View / Download</button></a>
+          {% else %}
+            <small>Not available</small>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% endif %}
+
+</body>
+</html>

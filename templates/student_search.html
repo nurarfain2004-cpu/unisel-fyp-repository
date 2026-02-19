@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}Student Search{% endblock %}
+
+{% block content %}
+<div class="card student-search-card">
+  <h1 class="title">Student Search</h1>
+  <p class="subtitle">Search report abstracts (request admin approval to view full PDF)</p>
+
+  <!-- Search row -->
+  <div class="student-search-bar">
+    <input id="q" class="bubbly-input student-search-input" type="text"
+           placeholder="Search by doc no, title, or abstract...">
+
+    <button class="btn primary sm" type="button" onclick="doSearch()">Search</button>
+    <button class="btn sm" type="button" onclick="showLatest()">Show Latest</button>
+  </div>
+
+  <!-- Suggestions -->
+  <div class="suggest-wrap">
+    <div class="suggest-title">Suggestions</div>
+    <div id="suggestions" class="suggest-list"></div>
+  </div>
+
+  <!-- Results -->
+  <div id="results" class="results-wrap"></div>
+
+  <div class="footer-actions">
+    <a class="btn" href="{{ dashboard_url }}">Back to Dashboard</a>
+    <a class="btn danger" href="/logout">Log Out</a>
+  </div>
+</div>
+
+<script>
+  function escapeHtml(str){
+    return String(str || "").replace(/[&<>"']/g, function(m){
+      return ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+      })[m];
+    });
+  }
+
+  function setQueryAndSearch(text){
+    document.getElementById("q").value = text;
+    doSearch();
+  }
+
+  async function renderSuggestions(items){
+    const box = document.getElementById("suggestions");
+    box.innerHTML = "";
+
+    if(!items || items.length === 0){
+      box.innerHTML = "<div class='empty'>No suggestions.</div>";
+      return;
+    }
+
+    for(const s of items){
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "suggest-chip";
+      btn.textContent = s;
+      btn.onclick = () => setQueryAndSearch(s);
+      box.appendChild(btn);
+    }
+  }
+
+  async function renderResults(items){
+    const box = document.getElementById("results");
+    box.innerHTML = "";
+
+    if(!items || items.length === 0){
+      box.innerHTML = "<p class='empty'>No results.</p>";
+      return;
+    }
+
+    for(const r of items){
+      const div = document.createElement("div");
+      div.className = "result-card";
+
+      div.innerHTML = `
+        <div class="result-top">
+          <span class="result-docno">${escapeHtml(r.doc_no || "")}</span>
+        </div>
+
+        <div class="result-title">${escapeHtml(r.title || "")}</div>
+
+        <p class="result-abs">
+          ${escapeHtml((r.abstract || "").slice(0, 280))}
+          ${(r.abstract || "").length > 280 ? "..." : ""}
+        </p>
+
+        <div class="action-group">
+          <a class="btn primary sm" href="/student-request/${r.id}">Request Access</a>
+        </div>
+      `;
+      box.appendChild(div);
+    }
+  }
+
+  async function doSearch(){
+    const q = document.getElementById("q").value || "";
+    const res = await fetch(`/student-search-results?query=${encodeURIComponent(q)}`);
+    const data = await res.json();
+
+    await renderSuggestions(data.suggestions || []);
+    await renderResults(data.results || []);
+  }
+
+  async function showLatest(){
+    document.getElementById("q").value = "";
+    await doSearch();
+  }
+
+  // Load latest on open
+  showLatest();
+</script>
+{% endblock %}

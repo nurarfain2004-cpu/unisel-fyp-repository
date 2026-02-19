@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="card hero">
+  <h1 class="title">WELCOME {{ name|upper }}</h1>
+  <p class="subtitle">Admin Dashboard</p>
+
+  <div class="actions">
+    <a class="btn primary" href="/admin-requests">View Requests</a>
+
+    <div class="actions-secondary">
+      <a class="btn" href="/admin-users">Manage Users</a>
+      <a class="btn" href="/admin-create-user">Create User</a>
+      <a class="btn" href="/upload-report">Upload Report</a>
+      <a class="btn" href="/supervisor-my-reports">All Reports</a>
+      <a class="btn" href="/staff-search">Search Reports</a>
+      <a class="btn" href="/profile">Edit Profile</a>
+    </div>
+  </div>
+
+  <p class="hint">
+    Review access requests, manage users, and maintain repository content.
+  </p>
+</div>
+{% endblock %}

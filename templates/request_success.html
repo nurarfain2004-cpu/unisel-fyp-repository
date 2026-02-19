@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Request Submitted{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h1 class="title">Request Submitted ✅</h1>
+  <p class="subtitle">Your request has been sent to the admin.</p>
+
+  <div style="text-align:center;">
+    <a class="btn primary" href="/student-search">Back to Search</a>
+    <a class="btn" href="/student-requests">My Requests</a>
+  </div>
+</div>
+{% endblock %}

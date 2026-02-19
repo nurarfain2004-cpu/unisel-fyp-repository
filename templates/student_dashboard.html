@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="card hero">
+  <h1 class="title">WELCOME {{ name|upper }}</h1>
+  <p class="subtitle">Student Dashboard</p>
+
+  <div class="actions">
+    <a class="btn primary" href="/student-search">Search FYP Reports</a>
+
+    <div class="actions-secondary">
+      <a class="btn" href="/student-requests">My Requests</a>
+      <a class="btn" href="/profile">Edit Profile</a>
+    </div>
+  </div>
+
+  <p class="hint">
+    Search previous Final Year Projects and request access to full reports.
+  </p>
+</div>
+{% endblock %}

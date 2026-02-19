@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>View Report</title>
+</head>
+<body>
+
+  <a href="/my-requests"><button>Back to My Requests</button></a>
+
+  <h2>{{ report.title }}</h2>
+
+  <div style="margin:10px 0;">
+    <a href="/view-report/{{ report.title }}" target="_blank">
+      <button>Open PDF in New Tab</button>
+    </a>
+
+    <a href="/download-report/{{ report.title }}">
+      <button>Download PDF</button>
+    </a>
+  </div>
+
+  <iframe
+    src="/view-report/{{ report.title }}"
+    width="100%"
+    height="700px"
+    style="border:1px solid #ccc;"
+  ></iframe>
+
+</body>
+</html>

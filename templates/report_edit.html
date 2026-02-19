@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Edit Report{% endblock %}
+
+{% block content %}
+<div class="card hero" style="max-width: 980px; margin-top: 38px;">
+  <h1 class="title">Edit Report</h1>
+  <p class="subtitle">Update title and abstract</p>
+
+  <div style="max-width: 920px; margin: 18px auto 0;">
+    <p style="margin:0; font-weight:900;">Doc No: <span style="font-weight:700;">{{ report.doc_no }}</span></p>
+    <p style="margin:8px 0 0; font-weight:900;">Filename: <span style="font-weight:700;">{{ report.filename }}</span></p>
+  </div>
+
+  <form method="post" action="/report-edit/{{ report.id }}" style="margin-top: 20px;">
+    <div class="profile-simple">
+      <div class="row" style="grid-template-columns: 1fr; max-width: 920px; margin: 0 auto;">
+
+        <div class="col">
+          <label>Title</label>
+          <input class="bubbly-input" type="text" name="title" value="{{ report.title }}" required>
+        </div>
+
+        <div class="col">
+          <label>Abstract</label>
+          <textarea class="bubbly-input" name="abstract" rows="10" required style="border-radius:18px; resize:vertical;">{{ report.abstract }}</textarea>
+        </div>
+
+      </div>
+
+      <div class="profile-actions" style="margin-top: 18px;">
+        <button class="btn primary" type="submit">Save Changes</button>
+        <a class="btn" href="/supervisor-my-reports">Cancel</a>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

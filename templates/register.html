@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="card hero" style="max-width: 980px; margin-top: 38px;">
+  <h1 class="title">Register</h1>
+  <p class="subtitle">Student self-registration</p>
+
+  <form method="post" action="/register" class="login-center" enctype="multipart/form-data">
+
+    {% if error %}
+      <div class="alert error">{{ error }}</div>
+    {% endif %}
+
+    <div class="login-fields">
+      <div class="field">
+        <label>Full Name</label>
+        <input class="bubbly-input" type="text" name="name" placeholder="Enter your full name" required>
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input class="bubbly-input" type="email" name="email" placeholder="example@email.com" required>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <input class="bubbly-input" type="password" name="password" placeholder="Create a password" required>
+      </div>
+
+      <div class="field">
+        <label>Profile Picture (optional)</label>
+        <input class="bubbly-input" type="file" name="profile_pic" accept=".png,.jpg,.jpeg">
+      </div>
+    </div>
+
+    <p class="hint" style="text-align:center; margin-top: 14px;">
+      Supervisor/Admin accounts are created by the system administrator.
+    </p>
+
+    <div class="login-actions">
+      <button type="submit" class="btn primary">Create Student Account</button>
+      <a href="/login-page" class="btn">Go to Login</a>
+    </div>
+
+  </form>
+</div>
+{% endblock %}

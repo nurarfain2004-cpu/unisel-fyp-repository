@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search FYP Reports</title>
+
+  <style>
+    .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+    .searchWrap { display:flex; gap:10px; align-items:center; margin: 20px 0; }
+    .searchWrap input { width: 380px; padding: 10px; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap:18px; }
+    .card { border:1px solid #bbb; padding:14px; border-radius:10px; cursor:pointer; }
+    .icon { font-size:40px; text-align:center; margin-bottom:10px; }
+    .title { font-weight:700; font-size:14px; word-break: break-word; }
+    .small { font-size:12px; color:#444; margin-top:8px; height: 48px; overflow:hidden; }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div>Unisel Final Year Report Repository</div>
+    <div>
+      <a href="/supervisor-dashboard"><button type="button">Back to Dashboard</button></a>
+      <a href="/logout"><button type="button">Log Out</button></a>
+    </div>
+  </div>
+
+  <h2 style="text-align:center;">SEARCH FYP REPORTS</h2>
+
+  <form id="searchForm" class="searchWrap" style="justify-content:center;">
+    <input type="text" id="query" placeholder="Search report title / abstract..." required />
+    <button type="submit">Search</button>
+  </form>
+
+  <div id="resultsInfo" style="text-align:center;"></div>
+  <div id="grid" class="grid"></div>
+
+  <script>
+    const form = document.getElementById("searchForm");
+    const grid = document.getElementById("grid");
+    const info = document.getElementById("resultsInfo");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      grid.innerHTML = "";
+      info.textContent = "Searching...";
+
+      const q = document.getElementById("query").value.trim();
+      const res = await fetch(`/supervisor-search-results?query=${encodeURIComponent(q)}`);
+
+      if (!res.ok) {
+        info.textContent = "Error searching.";
+        return;
+      }
+
+      const data = await res.json();
+
+      if (!data || data.length === 0) {
+        info.textContent = "No results found.";
+        return;
+      }
+
+      info.textContent = `${data.length} result(s) found`;
+
+      data.forEach(r => {
+        const div = document.createElement("div");
+        div.className = "card";
+        div.innerHTML = `
+          <div class="icon">📄</div>
+          <div class="title">${r.title}</div>
+          <div class="small">${(r.abstract || "").slice(0, 120)}...</div>
+        `;
+        div.onclick = () => {
+          window.location.href = `/supervisor-view/${r.id}`;
+        };
+        grid.appendChild(div);
+      });
+    });
+  </script>
+
+</body>
+</html>

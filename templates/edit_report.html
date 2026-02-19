@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .box { max-width: 900px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px; }
+    input, textarea { width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 15px; }
+    button { padding: 10px 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>Edit Report</h2>
+
+  <p><b>Document No:</b> {{ report.doc_no }}</p>
+
+  <form method="post">
+    <label><b>Title</b></label>
+    <input type="text" name="title" value="{{ report.title }}" required>
+
+    <label><b>Abstract</b></label>
+    <textarea name="abstract" rows="10" required>{{ report.abstract }}</textarea>
+
+    <button type="submit">Save Changes</button>
+  </form>
+
+  <br>
+  <a href="/supervisor-my-reports">Cancel</a>
+</div>
+
+</body>
+</html>

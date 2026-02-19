@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Requests</title>
+</head>
+<body>
+
+  <h2>Student Requests</h2>
+
+  {% if msg %}
+    <p><b>{{ msg }}</b></p>
+  {% endif %}
+
+  <a href="/supervisor-dashboard"><button type="button">Back to Dashboard</button></a>
+
+  <table border="1" cellpadding="10" cellspacing="0" style="margin-top:15px;">
+    <tr>
+      <th>ID</th>
+      <th>Student</th>
+      <th>Report</th>
+      <th>Reason</th>
+      <th>Status</th>
+      <th>Reviewed By</th>
+      <th>Actions</th>
+    </tr>
+
+    {% for r in requests_list %}
+    <tr>
+      <td>{{ r.id }}</td>
+      <td>{{ r.student_name }}</td>
+      <td>
+        {% if report_map.get(r.report_id) %}
+          {{ report_map.get(r.report_id).title }}
+        {% else %}
+          Report ID: {{ r.report_id }}
+        {% endif %}
+      </td>
+      <td>{{ r.reason }}</td>
+      <td>{{ r.status }}</td>
+      <td>{{ r.reviewed_by or "-" }}</td>
+      <td>
+        {% if r.status == "pending" %}
+          <form action="/requests/{{ r.id }}/approve" method="post" style="display:inline;">
+            <button type="submit">Approve</button>
+          </form>
+          <form action="/requests/{{ r.id }}/reject" method="post" style="display:inline;">
+            <button type="submit">Reject</button>
+          </form>
+        {% else %}
+          -
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+
+</body>
+</html>

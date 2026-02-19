@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Request Access</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .box { max-width: 650px; border: 1px solid #ddd; border-radius: 10px; padding: 18px; }
+    label { display:block; margin-top: 12px; font-weight: bold; }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+    textarea { height: 140px; resize: vertical; }
+    button { margin-top: 16px; padding: 10px 14px; border: none; border-radius: 6px; background: #3498db; color: white; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h2>Request Access</h2>
+
+    <p><b>Report:</b> {{ report.title }}</p>
+    <p><b>Doc No:</b> {{ report.doc_no }}</p>
+
+    <form action="/submit-request" method="post">
+      <input type="hidden" name="report_id" value="{{ report.id }}">
+
+      <label>Name</label>
+      <input type="text" name="student_name" required>
+
+      <label>Matric No</label>
+      <input type="text" name="matric_no" required>
+
+      <label>Reason</label>
+      <textarea name="reason" required></textarea>
+
+      <button type="submit">Submit Request</button>
+    </form>
+  </div>
+
+</body>
+</html>

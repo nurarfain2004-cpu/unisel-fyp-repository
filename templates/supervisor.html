@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Supervisor Dashboard{% endblock %}
+
+{% block content %}
+<div class="card hero">
+  <h1 class="title">WELCOME {{ name|upper }}</h1>
+  <p class="subtitle">Supervisor Dashboard</p>
+
+  <div class="actions">
+    <a class="btn primary" href="/upload-report">Upload FYP Report</a>
+
+    <div class="actions-secondary">
+      <a class="btn" href="/supervisor-my-reports">View My Reports</a>
+      <a class="btn" href="/staff-search">Search FYP Reports</a>
+      <a class="btn" href="/profile">Edit Profile</a>
+    </div>
+  </div>
+
+  <p class="hint">
+    Upload new reports, manage your submissions, and search the repository.
+  </p>
+</div>
+{% endblock %}

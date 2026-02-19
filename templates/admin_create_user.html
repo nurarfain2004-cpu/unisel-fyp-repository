@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Admin - Create User{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h1 class="title">Create User</h1>
+  <p class="subtitle">Admin can create Student / Supervisor / Admin accounts</p>
+
+  {% if error %}
+    <div class="alert error">{{ error }}</div>
+  {% endif %}
+
+  <form action="/admin-create-user" method="post" enctype="multipart/form-data" class="form-grid">
+
+    <div class="field">
+      <label>Full Name</label>
+      <input class="bubbly-input" type="text" name="name" required>
+    </div>
+
+    <div class="field">
+      <label>Email</label>
+      <input class="bubbly-input" type="email" name="email" required>
+    </div>
+
+    <div class="field">
+      <label>Temporary Password</label>
+      <input class="bubbly-input" type="password" name="password" required>
+    </div>
+
+    <div class="field">
+      <label>Role</label>
+      <select class="bubbly-input" name="role" required>
+        <option value="student">Student</option>
+        <option value="supervisor">Supervisor</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+
+    <div class="field full">
+      <label>Profile Picture (optional)</label>
+      <input class="bubbly-input" id="profilePic" type="file" name="profile_pic" accept=".png,.jpg,.jpeg">
+      <img id="preview" class="preview" alt="">
+    </div>
+
+    <div class="form-actions full">
+      <button class="btn primary" type="submit">Create Account</button>
+      <a class="btn" href="/admin-users">Back to Users</a>
+    </div>
+  </form>
+</div>
+
+<script>
+  const input = document.getElementById('profilePic');
+  const preview = document.getElementById('preview');
+
+  input?.addEventListener('change', () => {
+    const file = input.files?.[0];
+    if(!file){
+      preview.style.display = 'none';
+      preview.src = '';
+      return;
+    }
+    preview.src = URL.createObjectURL(file);
+    preview.style.display = 'inline-block';
+  });
+</script>
+{% endblock %}

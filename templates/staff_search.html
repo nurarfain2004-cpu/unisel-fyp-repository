@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Staff Search{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h1 class="title">Staff Search</h1>
+  <p class="subtitle">Search and view full reports (Supervisor / Admin)</p>
+
+  <!-- Centered search row -->
+  <div class="search-row">
+    <div class="field">
+      <label for="q">Search</label>
+      <input id="q" class="bubbly-input" type="text"
+             placeholder="Search by doc no, title, abstract, or uploaded_by...">
+    </div>
+
+    <div class="search-actions">
+      <button class="btn primary" type="button" onclick="doSearch()">Search</button>
+      <button class="btn" type="button" onclick="showLatest()">Show Latest</button>
+    </div>
+  </div>
+
+  <div id="results" class="results"></div>
+
+  <div class="footer-actions">
+    <a class="btn" href="{{ dashboard_url }}">Back to Dashboard</a>
+    <a class="btn danger" href="/logout">Log Out</a>
+  </div>
+</div>
+
+<script>
+  async function renderResults(items){
+    const box = document.getElementById("results");
+    box.innerHTML = "";
+
+    if(!items || items.length === 0){
+      box.innerHTML = "<p class='empty'>No results.</p>";
+      return;
+    }
+
+    for(const r of items){
+      const div = document.createElement("div");
+      div.className = "result-card";
+
+      div.innerHTML = `
+        <div class="result-top">
+          <span class="result-docno">${escapeHtml(r.doc_no || "")}</span>
+        </div>
+
+        <div class="result-title">${escapeHtml(r.title || "")}</div>
+        <div class="result-meta">Uploaded by: ${escapeHtml(r.uploaded_by || "")}</div>
+
+        <p class="result-abs">
+          ${escapeHtml((r.abstract || "").slice(0, 280))}
+          ${(r.abstract || "").length > 280 ? "..." : ""}
+        </p>
+
+        <div class="action-group">
+          <a class="btn primary sm" href="/staff-view/${r.id}">View PDF</a>
+          <a class="btn sm" href="/report-download/${r.id}">Download</a>
+          <a class="btn sm" href="/report-edit/${r.id}">Edit</a>
+        </div>
+      `;
+      box.appendChild(div);
+    }
+  }
+
+  async function doSearch(){
+    const q = document.getElementById("q").value || "";
+    const res = await fetch(`/staff-search-results?query=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    await renderResults(data.results || []);
+  }
+
+  async function showLatest(){
+    document.getElementById("q").value = "";
+    await doSearch();
+  }
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, function(m){
+      return ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+      })[m];
+    });
+  }
+
+  // load latest on page open
+  showLatest();
+</script>
+{% endblock %}

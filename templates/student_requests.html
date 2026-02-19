@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}My Requests{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h1 class="title">My Requests</h1>
+  <p class="subtitle">Track your access requests here</p>
+
+  {% if reqs and reqs|length > 0 %}
+    <table class="table" style="margin-top:12px; width:100%;">
+      <tr>
+        <th>ID</th>
+        <th>Report</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+      {% for r in reqs %}
+      <tr>
+        <td>{{ r.id }}</td>
+        <td>{{ reports.get(r.report_id, "Unknown Report") }}</td>
+        <td>{{ r.status }}</td>
+        <td>
+          {% if r.status == "approved" %}
+            <a class="btn primary" href="/student-view-approved/{{ r.id }}">View / Download</a>
+          {% else %}
+            <span>-</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <p style="margin-top:12px;">No requests found yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

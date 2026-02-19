@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report List</title>
+</head>
+<body>
+
+  <h2>Uploaded Reports</h2>
+
+{% if msg %}
+<script>
+  window.addEventListener("load", function () {
+    const message = {{ msg | tojson }};
+    alert(message);
+
+    // Remove ?msg= from the URL after user clicks OK
+    const url = new URL(window.location.href);
+    url.searchParams.delete("msg");
+    window.history.replaceState({}, document.title, url.pathname + url.search);
+  });
+</script>
+{% endif %}
+ 
+  <div style="margin-bottom: 15px;">
+    <a href="/upload-report-page">
+      <button type="button">Upload New Report</button>
+    </a>
+
+    <a href="/supervisor-search">
+      <button type="button">Go to Search</button>
+    </a>
+  </div>
+
+  {% if reports and reports|length > 0 %}
+    <table border="1" cellpadding="10" cellspacing="0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Title</th>
+          <th>Uploaded By</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in reports %}
+          <tr>
+            <td>{{ r.id }}</td>
+            <td>{{ r.title }}</td>
+            <td>{{ r.uploaded_by }}</td>
+            <td>{{ r.status }}</td>
+            <td>
+              <!-- View -->
+              <a href="/view-report/{{ r.title }}">
+                <button type="button">View</button>
+              </a>
+
+              <!-- Delete (POST) -->
+              <form action="/delete-report/{{ r.id }}" method="post" style="display:inline;"
+                    onsubmit="return confirm('Are you sure you want to delete this report?');">
+                <button type="submit">Remove</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No reports uploaded yet.</p>
+  {% endif %}
+
+</body>
+</html>

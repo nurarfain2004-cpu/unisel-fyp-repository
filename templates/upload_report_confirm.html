@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Confirm Extracted Details</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .box { max-width: 900px; margin: 0 auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px; }
+    input, textarea { width: 100%; padding: 10px; margin-top: 8px; margin-bottom: 15px; }
+    button { padding: 10px 16px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>{{ who }} Confirm Extracted Info</h2>
+
+    <form action="/upload-report-confirm" method="post">
+      <input type="hidden" name="tmp_file" value="{{ tmp_file }}">
+
+      <label><b>Title</b></label>
+      <input type="text" name="title" value="{{ title }}" required>
+
+      <label><b>Abstract</b></label>
+      <textarea name="abstract" rows="10" required>{{ abstract }}</textarea>
+
+      <button type="submit">Confirm & Save</button>
+    </form>
+
+    <br>
+    <a href="/upload-report">← Back</a>
+  </div>
+</body>
+</html>

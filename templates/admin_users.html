@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Admin - Users{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h1 class="title">Users</h1>
+  <p class="subtitle">Manage all registered accounts</p>
+
+  <div class="top-actions">
+    <a class="btn primary" href="/admin-create-user">Create User</a>
+    <a class="btn" href="/admin-dashboard">Back to Dashboard</a>
+  </div>
+
+  {% if users|length == 0 %}
+    <p class="empty">No users found.</p>
+  {% else %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:80px;">ID</th>
+            <th style="width:260px;">Name</th>
+            <th>Email</th>
+            <th style="width:140px;">Role</th>
+            <th style="width:220px; text-align:right;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td>{{ u.id }}</td>
+            <td>{{ u.name }}</td>
+            <td>{{ u.email }}</td>
+            <td style="text-transform:capitalize;">{{ u.role }}</td>
+            <td style="text-align:right;">
+              <form action="/admin-user-delete/{{ u.id }}" method="post" style="display:inline;">
+                <button class="btn danger sm" type="submit"
+                        onclick="return confirm('Delete this user account?')">
+                  Delete
+                </button>
+              </form>
+              <div class="note">(You can’t delete yourself)</div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

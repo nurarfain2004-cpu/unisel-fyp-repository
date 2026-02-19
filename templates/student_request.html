@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Request Access{% endblock %}
+
+{% block content %}
+<div class="card hero" style="max-width: 800px;">
+  <h1 class="title" style="font-size: 36px; letter-spacing: 2px;">Request Access</h1>
+
+  <p class="hint" style="text-align:center; margin-bottom: 18px;">
+    Fill in the details below to request access to this report.
+  </p>
+
+  <div style="max-width: 720px; margin: 0 auto;">
+    <p><strong>Report:</strong> {{ report.title }}</p>
+    <p><strong>Doc No:</strong> {{ report.doc_no }}</p>
+  </div>
+
+  <form method="post" action="/submit-request" style="margin-top: 18px;">
+    <!-- IMPORTANT: report_id required by main.py -->
+    <input type="hidden" name="report_id" value="{{ report.id }}">
+
+    <div class="profile-simple">
+      <div class="row">
+        <div class="col">
+          <label>Name</label>
+          <input class="bubbly-input" type="text" name="student_name" required>
+        </div>
+
+        <div class="col">
+          <label>Matric No</label>
+          <input class="bubbly-input" type="text" name="matric_no" required>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          <label>Reason</label>
+          <textarea class="bubbly-input" name="reason" rows="4" required
+            style="border-radius: 18px;"></textarea>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <button type="submit" class="btn primary">Submit Request</button>
+        <a class="btn" href="/student-search">Back</a>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Upload Report{% endblock %}
+
+{% block content %}
+<div class="card upload-card">
+
+  <h1 class="title">Upload Report</h1>
+  <p class="subtitle">Upload PDF and confirm title & abstract</p>
+
+  {% if error %}
+    <div class="alert error">{{ error }}</div>
+  {% endif %}
+
+  <form action="/upload-report" method="post" enctype="multipart/form-data" class="upload-form">
+
+    <div class="field full">
+      <label>Report File (PDF)</label>
+      <input id="pdfFile" class="bubbly-input" type="file" name="pdf_file" accept=".pdf" required>
+    </div>
+
+    <div class="center">
+      <button class="btn primary sm" type="button" onclick="extractMeta()">
+        Extract Title & Abstract
+      </button>
+    </div>
+
+    <div class="extract-grid">
+      <div class="field full">
+        <label>Title</label>
+        <input id="title" class="bubbly-input title-input" type="text" name="title"
+               placeholder="Click extract to fill this" required>
+      </div>
+
+      <div class="field full">
+        <label>Abstract</label>
+        <textarea id="abstract" class="bubbly-input abstract-box" name="abstract" rows="9"
+                  placeholder="Click extract to fill this" required></textarea>
+      </div>
+    </div>
+
+    <div class="confirm-area">
+      <button class="btn primary" type="submit">Confirm Upload</button>
+    </div>
+
+    <div class="footer-actions">
+      <a class="btn" href="{{ dashboard_url }}">Back</a>
+      <a class="btn danger" href="/logout">Log Out</a>
+    </div>
+
+  </form>
+</div>
+
+<script>
+  // OPTION A (recommended): call backend extraction endpoint
+  // You need to implement POST /extract-meta (example below)
+  async function extractMeta(){
+    const fileInput = document.getElementById("pdfFile");
+    if(!fileInput.files || fileInput.files.length === 0){
+      alert("Please choose a PDF first.");
+      return;
+    }
+
+    const fd = new FormData();
+    fd.append("pdf_file", fileInput.files[0]);
+
+    try{
+      const res = await fetch("/extract-meta", { method: "POST", body: fd });
+      if(!res.ok){
+        alert("Failed to extract. Check backend route /extract-meta.");
+        return;
+      }
+      const data = await res.json();
+      document.getElementById("title").value = data.title || "";
+      document.getElementById("abstract").value = data.abstract || "";
+    }catch(e){
+      alert("Extraction error. Check console.");
+      console.error(e);
+    }
+  }
+</script>
+{% endblock %}

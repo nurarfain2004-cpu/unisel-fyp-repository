@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}My Reports{% endblock %}
+
+{% block content %}
+<div class="card hero" style="max-width: 1100px; margin-top: 38px;">
+  <h1 class="title">My Reports</h1>
+  <p class="subtitle">Manage your uploaded reports</p>
+
+  {% if reports|length == 0 %}
+    <p style="text-align:center; color:#6b7280; margin-top:18px;">No reports uploaded yet.</p>
+  {% else %}
+    <div style="overflow-x:auto; margin-top: 18px;">
+      <table class="table">
+        <thead>
+          <tr>
+            <th style="min-width:160px;">Doc No</th>
+            <th style="min-width:380px;">Title</th>
+            <th style="min-width:240px;">Uploaded By</th>
+            <th style="min-width:360px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in reports %}
+          <tr>
+            <td style="font-weight:900;">{{ r.doc_no }}</td>
+            <td>{{ r.title }}</td>
+            <td>{{ r.uploaded_by }}</td>
+            <td>
+              <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                <a class="btn" href="/report-download/{{ r.id }}">Download</a>
+                <a class="btn" href="/report-edit/{{ r.id }}">Edit</a>
+
+                <form action="/report-delete/{{ r.id }}" method="post" style="display:inline;">
+                  <button class="btn danger" type="submit"
+                    onclick="return confirm('Delete this report? This cannot be undone.')">
+                    Delete
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
+  <div style="text-align:center; margin-top:18px;">
+    <a class="btn" href="{{ dashboard_url }}">Back to Dashboard</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<div class="card hero" style="max-width: 980px;">
+  <h1 class="title">Edit Profile</h1>
+  <p class="subtitle">Update your name, email, password, and profile picture</p>
+
+  {% if error %}
+    <div class="alert error">{{ error }}</div>
+  {% endif %}
+
+  <form method="post" action="/profile-update" enctype="multipart/form-data" class="profile-simple">
+
+    <!-- ROW 1: Picture + Upload -->
+    <div class="row">
+      <div class="col">
+        <label>Current Profile Picture</label>
+        <img class="profile-preview"
+             src="{{ user.profile_pic or '/static/default_avatar.png' }}"
+             alt="profile">
+      </div>
+
+      <div class="col">
+        <label>New Profile Picture (optional)</label>
+        <input class="bubbly-input" type="file" name="profile_pic" accept=".png,.jpg,.jpeg">
+        <p class="hint">PNG / JPG only</p>
+      </div>
+    </div>
+
+    <!-- ROW 2: Name + Email -->
+    <div class="row">
+      <div class="col">
+        <label>Full Name</label>
+        <input class="bubbly-input" type="text" name="name" value="{{ user.name }}">
+      </div>
+
+      <div class="col">
+        <label>Email</label>
+        <input class="bubbly-input" type="email" name="email" value="{{ user.email }}">
+      </div>
+    </div>
+
+    <!-- Note -->
+    <p class="hint" style="text-align:center; margin-top: 10px;">
+      To change your email or password, please enter your current password.
+    </p>
+
+    <!-- ROW 3: Current + New Password -->
+    <div class="row">
+      <div class="col">
+        <label>Current Password</label>
+        <input class="bubbly-input" type="password" name="current_password" placeholder="Current password">
+      </div>
+
+      <div class="col">
+        <label>New Password (optional)</label>
+        <input class="bubbly-input" type="password" name="new_password" placeholder="New password">
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="profile-actions">
+      <button type="submit" class="btn primary">Save Changes</button>
+      <a class="btn" href="{{ dashboard_url }}">Back</a>
+    </div>
+
+  </form>
+</div>
+{% endblock %}

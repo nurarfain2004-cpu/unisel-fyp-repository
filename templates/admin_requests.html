@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Admin - Requests{% endblock %}
+
+{% block content %}
+<div class="card">
+  <h1 class="title">Access Requests</h1>
+  <p class="subtitle">Approve or reject student access requests</p>
+
+  {% if requests|length == 0 %}
+    <p style="text-align:center; color:#6b5f55;">No access requests found.</p>
+  {% else %}
+    <div style="overflow-x:auto;">
+      <table class="table admin-req-table">
+        <thead>
+          <tr>
+            <th style="min-width:60px;">ID</th>
+            <th style="min-width:220px;">Report</th>
+            <th style="min-width:160px;">Student</th>
+            <th style="min-width:140px;">Matric</th>
+            <th style="min-width:220px;">Email</th>
+            <th style="min-width:260px;">Reason</th>
+            <th style="min-width:120px;">Status</th>
+            <th style="min-width:220px;">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in requests %}
+          <tr>
+            <td>{{ r.id }}</td>
+
+            <td class="cut">
+              {{ r.report_title }}
+            </td>
+
+            <td class="cut">
+              {{ r.student_name }}
+            </td>
+
+            <td class="cut">
+              {{ r.matric_no }}
+            </td>
+
+            <td class="cut">
+              {{ r.email }}
+            </td>
+
+            <td class="cut">
+              {{ r.reason }}
+            </td>
+
+            <td style="text-transform:capitalize;">
+              <span class="status-pill {{ r.status }}">{{ r.status }}</span>
+            </td>
+
+            <td>
+              {% if r.status == "pending" %}
+                <div class="table-actions">
+                  <form action="/admin-approve/{{ r.id }}" method="post">
+                    <button class="btn primary xs" type="submit"
+                      onclick="return confirm('Approve this request?')">
+                      Approve
+                    </button>
+                  </form>
+
+                  <form action="/admin-reject/{{ r.id }}" method="post">
+                    <button class="btn danger xs" type="submit"
+                      onclick="return confirm('Reject this request?')">
+                      Reject
+                    </button>
+                  </form>
+                </div>
+              {% else %}
+                <span style="color:#6b5f55;">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

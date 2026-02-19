@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>View Report</title>
+</head>
+<body>
+  <a href="/supervisor-search"><button type="button">Back to Search</button></a>
+
+  <h2>{{ report.title }}</h2>
+  <p><b>Uploaded by:</b> {{ report.uploaded_by }}</p>
+  <p><b>Status:</b> {{ report.status }}</p>
+
+  <iframe
+    src="/view-report/{{ report.title }}"
+    width="100%"
+    height="700px"
+    style="border:1px solid #ccc;"
+  ></iframe>
+</body>
+</html>
