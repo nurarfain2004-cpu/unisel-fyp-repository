@@ -9,7 +9,7 @@
 
 body {
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #f7f1e8; /* beige */
+  background: #f7f1e8;
   color: #111827;
   line-height: 1.6;
 }
@@ -26,12 +26,33 @@ a {
   background: #ffffff;
   border-bottom: 1px solid #e5e7eb;
   padding: 18px 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.topbar h1 {
+.topbar .brand {
   font-size: 20px;
   letter-spacing: 2px;
   font-weight: 900;
+}
+
+.topbar .right {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.toplink {
+  font-weight: 700;
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #111827;
 }
 
 /* =========================
@@ -40,10 +61,11 @@ a {
 .container {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 36px;
 }
 
 .hero {
-  padding: 48px 36px;
+  padding: 48px 0;
 }
 
 .card {
@@ -134,7 +156,6 @@ label {
   box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
 }
 
-/* textarea variant */
 textarea.bubbly-input {
   border-radius: 22px;
 }
@@ -190,15 +211,10 @@ textarea.bubbly-input {
   box-shadow: 0 14px 28px rgba(0,0,0,0.25);
 }
 
-/* 🔴 DELETE BUTTON */
 .btn.danger {
   background: #ffffff;
   border-color: #991b1b;
   color: #991b1b;
-}
-
-.btn.danger:hover {
-  box-shadow: 0 10px 22px rgba(153,27,27,0.15);
 }
 
 /* =========================
@@ -253,3 +269,4 @@ input[type="file"] {
 .spacer {
   height: 40px;
 }
+
