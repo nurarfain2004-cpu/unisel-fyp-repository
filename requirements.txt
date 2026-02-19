@@ -6,3 +6,4 @@ sqlalchemy
 python-dotenv
 pdfplumber
 itsdangerous
+psycopg2-binary
