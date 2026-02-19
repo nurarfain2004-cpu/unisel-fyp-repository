@@ -453,6 +453,16 @@ def register(
 
     return RedirectResponse("/login-page", status_code=HTTP_302_FOUND)
 
+@app.get("/make-me-admin")
+def make_me_admin(db: Session = Depends(get_db)):
+    user = db.query(User).first()
+    if not user:
+        return {"error": "No users found"}
+
+    user.role = "admin"
+    db.commit()
+    return {"ok": True, "email": user.email, "role": user.role}
+
 
 @app.get("/login-page", response_class=HTMLResponse)
 def login_page(request: Request):
@@ -1098,3 +1108,4 @@ def staff_view_full_pdf(request: Request, report_id: int, db: Session = Depends(
     if not r:
         raise HTTPException(status_code=404, detail="Report not found")
     return FileResponse(path=r.file_path, filename=r.filename, media_type="application/pdf")
+
