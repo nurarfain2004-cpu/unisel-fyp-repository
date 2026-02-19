@@ -44,17 +44,17 @@ TEMPLATES_DIR.mkdir(exist_ok=True)
 STATIC_DIR.mkdir(exist_ok=True)
 PROFILE_DIR.mkdir(parents=True, exist_ok=True)
 
+# ✅ Render/Prod DB support (Postgres) + fallback to local SQLite
 DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{DB_PATH}")
 
-# Render Postgres uses "postgres://" sometimes, SQLAlchemy expects "postgresql://"
+# Render Postgres sometimes gives postgres://..., SQLAlchemy wants postgresql://
 if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 engine = create_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False}
-    if DATABASE_URL.startswith("sqlite")
-    else {}
+    connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {},
+    pool_pre_ping=True
 )
 
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
@@ -66,7 +66,7 @@ app = FastAPI(title="Unisel FYP Repository")
 SESSION_SECRET = os.getenv("SESSION_SECRET", "CHANGE_THIS_SECRET_KEY_NOW")
 app.add_middleware(SessionMiddleware, secret_key=SESSION_SECRET)
 
-# Static
+# Static + templates
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
@@ -112,11 +112,12 @@ class AccessRequest(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+# Create tables (works for SQLite and Postgres)
 Base.metadata.create_all(bind=engine)
 
 
 # =========================
-# MIGRATION (safe add missing columns)
+# MIGRATION (SQLite only)
 # =========================
 def _col_exists(db: Session, table: str, col: str) -> bool:
     rows = db.execute(text(f"PRAGMA table_info({table})")).fetchall()
@@ -124,6 +125,10 @@ def _col_exists(db: Session, table: str, col: str) -> bool:
 
 
 def migrate_sqlite_schema():
+    # ✅ ONLY RUN ON SQLITE (Postgres will error on PRAGMA)
+    if not DATABASE_URL.startswith("sqlite"):
+        return
+
     db = SessionLocal()
     try:
         # users
@@ -157,8 +162,51 @@ def migrate_sqlite_schema():
         db.close()
 
 
-if DATABASE_URL.startswith("sqlite"):
-    migrate_sqlite_schema()
+migrate_sqlite_schema()
+
+
+# =========================
+# BOOTSTRAP ADMIN (optional)
+# =========================
+def bootstrap_admin():
+    """
+    Optional: Create first admin automatically on Render (fresh DB).
+    Set these in Render Environment to use it:
+      ADMIN_EMAIL, ADMIN_PASSWORD, ADMIN_NAME (optional)
+    """
+    admin_email = (os.getenv("ADMIN_EMAIL", "") or "").strip().lower()
+    admin_password = (os.getenv("ADMIN_PASSWORD", "") or "").strip()
+    admin_name = (os.getenv("ADMIN_NAME", "System Admin") or "").strip()
+
+    if not admin_email or not admin_password:
+        return
+
+    db = SessionLocal()
+    try:
+        # if any admin exists, stop
+        if db.query(User).filter(User.role == "admin").first():
+            return
+
+        # if email exists already, stop
+        if db.query(User).filter(User.email == admin_email).first():
+            return
+
+        u = User(
+            name=admin_name,
+            email=admin_email,
+            password_hash=hash_password(admin_password),
+            role="admin",
+            profile_pic=""
+        )
+        db.add(u)
+        db.commit()
+        print("BOOTSTRAP: admin created")
+    finally:
+        db.close()
+
+
+# call after hash_password exists, so we call at the bottom of helpers section
+# (we will call it later)
 
 
 # =========================
@@ -230,50 +278,33 @@ def render(request: Request, template_name: str, extra: dict = None):
     return templates.TemplateResponse(template_name, ctx)
 
 
+# ✅ call bootstrap now that hash_password exists
+bootstrap_admin()
+
+
 # =========================
-# HELPERS (EMAIL)  ✅ IMPROVED (LESS SPAM)
+# HELPERS (EMAIL)
 # =========================
 def send_status_email(to_email: str, subject: str, body: str):
     sender = os.getenv("GMAIL_SENDER", "")
     app_pw = os.getenv("GMAIL_APP_PASSWORD", "")
-
-    # Debug prints help you verify where it was sent
-    print("---- EMAIL DEBUG ----")
-    print("FROM:", sender)
-    print("TO:", to_email)
-    print("SUBJECT:", subject)
-
     if not sender or not app_pw:
         print("EMAIL NOT SENT: Missing GMAIL_SENDER or GMAIL_APP_PASSWORD env vars.")
-        print("----------------------")
         return
 
     msg = EmailMessage()
-    # Friendlier From-name (less spammy)
-    msg["From"] = f"UNISEL FYP Repository <{sender}>"
+    msg["From"] = sender
     msg["To"] = to_email
-    msg["Reply-To"] = sender
     msg["Subject"] = subject
-
-    # Add a small footer (also reduces spam filtering)
-    msg.set_content(
-        body
-        + "\n\n---\nUNISEL FYP Repository System\nThis is an automated message. Please do not reply."
-    )
+    msg.set_content(body)
 
     try:
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
             smtp.login(sender, app_pw)
             smtp.send_message(msg)
-        print(f"EMAIL SENT to {to_email} ✅")
-    except smtplib.SMTPAuthenticationError as e:
-        print("EMAIL FAILED ❌ AUTH ERROR:", str(e))
-    except smtplib.SMTPRecipientsRefused as e:
-        print("EMAIL FAILED ❌ RECIPIENT REFUSED:", str(e))
+        print(f"EMAIL SENT to {to_email}")
     except Exception as e:
-        print("EMAIL FAILED ❌:", str(e))
-
-    print("----------------------")
+        print("EMAIL FAILED:", str(e))
 
 
 # =========================
@@ -380,7 +411,7 @@ def home(request: Request):
 
 
 # =========================
-# REGISTER / LOGIN (OPTION A)
+# REGISTER / LOGIN
 # =========================
 @app.get("/register-page", response_class=HTMLResponse)
 def register_page(request: Request):
@@ -674,7 +705,6 @@ def upload_report_extract(
     }
 
 
-# ✅ ALIAS: frontend can call /extract-meta too
 @app.post("/extract-meta")
 def extract_meta_alias(
     request: Request,
@@ -693,11 +723,6 @@ def upload_report_confirm(
     title: str = Form(...),
     abstract: str = Form(...)
 ):
-    """
-    Accept BOTH file field names:
-    - file
-    - pdf_file
-    """
     require_role(request, ["supervisor", "admin"])
 
     up = file or pdf_file
@@ -734,7 +759,6 @@ def upload_report_confirm(
     return RedirectResponse("/supervisor-my-reports", status_code=HTTP_302_FOUND)
 
 
-# ✅ NEW: Accept POST /upload-report too (so your form won’t 405 anymore)
 @app.post("/upload-report")
 def upload_report_post_alias(
     request: Request,
@@ -1007,10 +1031,9 @@ def admin_approve(request: Request, req_id: int, db: Session = Depends(get_db)):
     ar.reviewed_at = datetime.utcnow()
     db.commit()
 
-    # ✅ Recommended: neutral subject reduces spam
     send_status_email(
         ar.student_email,
-        "Unisel FYP Repository: Request Update",
+        "Unisel FYP Repository: Request Approved",
         "Your request has been APPROVED.\n\nPlease log in to view/download the report.\n\nThank you."
     )
 
@@ -1033,7 +1056,7 @@ def admin_reject(request: Request, req_id: int, db: Session = Depends(get_db)):
     send_status_email(
         ar.student_email,
         "Unisel FYP Repository: Request Update",
-        "Your request has been reviewed.\n\nStatus: REJECTED\n\nIf you have further enquiries, kindly email us.\n\nThank you."
+        "Your request has been Reviewed.\n\nStatus : Rejected\n\nIf you have further enquiries, kindly email us.\n\nThank you."
     )
 
     return RedirectResponse("/admin-requests", status_code=HTTP_302_FOUND)
@@ -1075,5 +1098,3 @@ def staff_view_full_pdf(request: Request, report_id: int, db: Session = Depends(
     if not r:
         raise HTTPException(status_code=404, detail="Report not found")
     return FileResponse(path=r.file_path, filename=r.filename, media_type="application/pdf")
-
-
