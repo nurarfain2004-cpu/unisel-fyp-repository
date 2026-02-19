@@ -59,7 +59,6 @@ img {
   justify-content: flex-end;
 }
 
-/* If you ever used toplink as plain anchor */
 .toplink {
   font-weight: 700;
   padding: 6px 8px;
@@ -70,7 +69,6 @@ img {
   background: rgba(17, 24, 39, 0.06);
 }
 
-/* Avatar should NEVER blow up */
 .avatar {
   width: 42px !important;
   height: 42px !important;
@@ -90,9 +88,7 @@ img {
 }
 
 @media (max-width: 900px) {
-  .container {
-    padding: 22px;
-  }
+  .container { padding: 22px; }
 }
 
 .hero {
@@ -100,9 +96,7 @@ img {
 }
 
 @media (max-width: 900px) {
-  .hero {
-    padding: 28px 0;
-  }
+  .hero { padding: 28px 0; }
 }
 
 .card {
@@ -110,7 +104,7 @@ img {
   border-radius: 26px;
   box-shadow: 0 20px 50px rgba(0,0,0,0.06);
   padding: 48px 48px 42px;
-  overflow: hidden; /* prevents overlap spilling out */
+  overflow: hidden;
 }
 
 @media (max-width: 900px) {
@@ -140,13 +134,13 @@ img {
 }
 
 @media (max-width: 900px) {
-  .title {
-    font-size: 34px;
-  }
-  .subtitle {
-    font-size: 16px;
-    margin-bottom: 22px;
-  }
+  .title { font-size: 34px; }
+  .subtitle { font-size: 16px; margin-bottom: 22px; }
+}
+
+/* Give paragraphs spacing so they don't sit under buttons */
+.card p {
+  margin-top: 14px;
 }
 
 /* =========================
@@ -175,10 +169,9 @@ label {
 
 .field {
   width: 100%;
-  min-width: 0; /* prevents grid overflow */
+  min-width: 0;
 }
 
-/* Center sections safely */
 .login-center {
   display: flex;
   flex-direction: column;
@@ -186,7 +179,6 @@ label {
   width: 100%;
 }
 
-/* Grid that won’t break on deploy */
 .login-fields {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -197,9 +189,7 @@ label {
 }
 
 @media (max-width: 900px) {
-  .login-fields {
-    grid-template-columns: 1fr;
-  }
+  .login-fields { grid-template-columns: 1fr; }
 }
 
 /* =========================
@@ -234,7 +224,6 @@ textarea.bubbly-input {
   width: 100%;
 }
 
-/* This fixes your profile layout “big / broken” */
 .profile-simple .row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -249,17 +238,17 @@ textarea.bubbly-input {
 }
 
 @media (max-width: 900px) {
-  .profile-simple .row {
-    grid-template-columns: 1fr;
-  }
+  .profile-simple .row { grid-template-columns: 1fr; }
 }
 
-/* If your profile page shows a big preview image */
+/* Profile image safety */
 .profile-preview,
 .current-profile-pic,
 .profile-picture,
 .profile-image,
-.profile-img {
+.profile-img,
+.profile-pic,
+img.profile-pic {
   width: 220px;
   height: 220px;
   border-radius: 50%;
@@ -288,6 +277,20 @@ textarea.bubbly-input {
   max-width: 100%;
 }
 
+/* HARD OVERRIDES to stop overlap (Render issue) */
+.btn,
+a.btn,
+button.btn {
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  float: none !important;
+  margin: 0 !important;
+}
+
 .btn:hover {
   box-shadow: 0 12px 24px rgba(0,0,0,0.12);
 }
@@ -307,23 +310,16 @@ textarea.bubbly-input {
   color: #991b1b;
 }
 
-/* If links are styled as buttons */
-a.btn {
-  text-decoration: none;
-}
+a.btn { text-decoration: none; }
 
 /* =========================
-   ACTION ROWS (important)
-   Fixes “stumbled / overlapped buttons”
+   ACTION ROWS
+   (Applies even if your HTML uses random class names)
 ========================= */
+
+/* Your existing ones */
 .login-actions,
-.profile-actions,
-.actions,
-.button-row,
-.btn-row,
-.dashboard-actions,
-.links,
-.menu {
+.profile-actions {
   display: flex;
   gap: 18px;
   justify-content: center;
@@ -332,22 +328,53 @@ a.btn {
   align-items: center;
 }
 
-/* On small screens, make buttons full width nicely */
+/* UNIVERSAL: any div that contains many buttons/links inside the card */
+.card div {
+  max-width: 100%;
+}
+
+/* If a container has multiple buttons, force flex wrapping */
+.card .actions,
+.card .button-row,
+.card .btn-row,
+.card .dashboard-actions,
+.card .links,
+.card .menu,
+.card .nav-actions,
+.card .action-row {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 14px !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  margin-top: 18px !important;
+  margin-bottom: 12px !important;
+}
+
+/* Even if you didn't use those classnames: make consecutive buttons wrap */
+.card a.btn,
+.card button.btn {
+  margin-bottom: 10px !important;
+}
+
+/* On small screens, buttons become full width nicely */
 @media (max-width: 520px) {
   .login-actions .btn,
   .profile-actions .btn,
-  .actions .btn,
-  .button-row .btn,
-  .btn-row .btn,
-  .dashboard-actions .btn,
-  .links .btn,
-  .menu .btn {
+  .card .actions .btn,
+  .card .button-row .btn,
+  .card .btn-row .btn,
+  .card .dashboard-actions .btn,
+  .card .links .btn,
+  .card .menu .btn,
+  .card .nav-actions .btn,
+  .card .action-row .btn {
     width: 100%;
   }
 }
 
 /* =========================
-   TABLES (with visible lines)
+   TABLES (with clear lines)
 ========================= */
 .table,
 table {
@@ -382,7 +409,6 @@ table tr:hover {
   background: #fdf9f3;
 }
 
-/* Make tables scroll on mobile instead of breaking layout */
 .table-wrap {
   width: 100%;
   overflow-x: auto;
@@ -397,19 +423,8 @@ input[type="file"] {
 }
 
 /* =========================
-   SMALL SPACING HELPERS
+   FOOTER SPACE
 ========================= */
 .spacer {
   height: 40px;
 }
-
-/* Prevent headings/buttons from sitting on top of other text */
-h1, h2, h3, h4, p, .subtitle {
-  position: relative;
-}
-
-/* If any page uses very large icons/images accidentally */
-svg, .icon, .profile-icon {
-  max-width: 100%;
-}
-
