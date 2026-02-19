@@ -157,7 +157,8 @@ def migrate_sqlite_schema():
         db.close()
 
 
-migrate_sqlite_schema()
+if DATABASE_URL.startswith("sqlite"):
+    migrate_sqlite_schema()
 
 
 # =========================
@@ -1074,4 +1075,5 @@ def staff_view_full_pdf(request: Request, report_id: int, db: Session = Depends(
     if not r:
         raise HTTPException(status_code=404, detail="Report not found")
     return FileResponse(path=r.file_path, filename=r.filename, media_type="application/pdf")
+
 
